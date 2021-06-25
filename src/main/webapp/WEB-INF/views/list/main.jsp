@@ -348,7 +348,7 @@
                 <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search"
                       action="/list/add" method="post">
 
-
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="Warzywa" name="categories">
                         <label class="form-check-label" for="inlineCheckbox1">Warzywa</label>

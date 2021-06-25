@@ -66,12 +66,16 @@ public class UserController {
     public String createUser(@RequestParam String repassword, @RequestParam String password, @Valid User user, BindingResult result, Model model) {
         if (result.hasErrors()) {
             return "/register";
+        } else if (!User.checkPassword(user.getPassword())) {
+            model.addAttribute("msg", "Hasło musi mieć co najmniej jedną wielką literę, jedną małą literę i jedną cyfrę oraz długość od 5 do 30 znaków");
+            return "/register";
+        } else if (!(password.equals(repassword))) {
+            model.addAttribute("msg", "Hasła nie są identyczne");
+            return "/register";
         } else if (!userService.checkMail(user.getEmail())) {
             model.addAttribute("msg", "Użytkownik o podanym adresie juz istnieje");
             return "/register";
         } else {
-
-            //        TODO logika tworzenia usera
 
             userService.saveUser(user);
 
