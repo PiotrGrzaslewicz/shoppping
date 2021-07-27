@@ -34,5 +34,9 @@ public interface ShoppingListRepository extends JpaRepository<ShoppingList, Long
     @Query(value = "DELETE from products WHERE category_id = ?1", nativeQuery = true)
     void clearListCategories(Long id);
 
+    @Modifying
+    @Transactional
+    void deleteAllByUser(User user);
+
 
 }

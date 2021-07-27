@@ -79,7 +79,7 @@
                         <div class="card shadow mb-4 border-left-0 border-bottom-0 border-right-0 border-top-0 bg-gray-700">
                             <!-- Card Header - Accordion -->
                             <a  class="d-block card-header py-3 bg-gray-900 border-bottom-0">
-                                <h6 class="m-0 font-weight-bold text-white">Błąd 404</h6>
+                                <h6 class="m-0 font-weight-bold text-white">Błąd</h6>
                             </a>
                             <!-- Card Content - Collapse -->
                             <div class="collapse show" id="coll2">

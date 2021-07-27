@@ -9,4 +9,5 @@ public interface UserService {
     boolean checkMail(String email);
 
     boolean checkPassword(User user, String password);
+    void resetDemoUser();
 }

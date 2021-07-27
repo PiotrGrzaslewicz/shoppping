@@ -1,17 +1,22 @@
 package pl.mrook.shopping.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pl.mrook.shopping.model.User;
 import pl.mrook.shopping.service.CurrentUser;
 import pl.mrook.shopping.service.SpringDataUserDetailsService;
 import pl.mrook.shopping.service.UserService;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @Slf4j
@@ -112,8 +117,7 @@ public class UserController {
             model.addAttribute("msg", "Niepoprawne dane");
             return "/login";
         } else {
-//            TODO poprawny user
-            log.warn("przeszło testy");
+//
             UserDetails currentUser = detailsService.loadUserByUsername(email);
             return "redirect:/list/main";
         }
@@ -149,5 +153,21 @@ public class UserController {
             return "redirect:/list/main";
         }
     }
+
+    @GetMapping("/demo")
+    public String launchDemo(HttpServletRequest request) {
+        userService.resetDemoUser();
+        authWithHttpServletRequest(request, "demo@demo", "Demo1");
+        return "redirect:/list/main";
+    }
+
+    public void authWithHttpServletRequest(HttpServletRequest request, String username, String password) {
+        try {
+            request.login(username, password);
+        } catch (ServletException e) {
+            log.error("Error while login ", e);
+        }
+    }
+
 
 }

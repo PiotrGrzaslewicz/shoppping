@@ -48,6 +48,20 @@
                         <h3 class="font-weight-bold text-gray-500">Logowanie</h3>
                     </div>
 
+                    <div class="flex-row">
+                        <div>
+
+                            <a href="/demo"
+                               class="btn btn-warning btn-sm btn-icon-split">
+                                                 <span class="icon text-white-50">
+                                                    <i class="fas fa-play"></i>
+                                                 </span>
+                                <span class="text">DEMO</span>
+                            </a>
+
+                        </div>
+                    </div>
+
 
                     <%--                 WRÓĆ do LISTY --%>
 
@@ -107,7 +121,9 @@
                                                 </button>
                                             </div>
 
+
                                         </form>
+
 
                                         <div class="text-center ">
                                             <a class="small text-white" href="/register">Nie masz konta? Zarejestruj się!</a>
