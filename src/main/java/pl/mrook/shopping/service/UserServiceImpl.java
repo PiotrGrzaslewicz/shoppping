@@ -72,13 +72,13 @@ public class UserServiceImpl implements UserService {
         user.setEmail("demo@demo");
         user.setName("Demo");
         user.setSurname("Demo User");
-        user.setPassword(passwordEncoder.encode("Demo1"));
+        user.setPassword("Demo1");
         user.setLists(new ArrayList<>() {
         });
         user.setMemos(new ArrayList<>());
         user.setEnabled(1);
         memoRepository.deleteAllByUser(user);
         shoppingListRepository.deleteAllByUser(user);
-        userRepository.save(user);
+        saveUser(user);
     }
 }
