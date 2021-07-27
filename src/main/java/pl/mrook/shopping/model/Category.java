@@ -22,8 +22,8 @@ public class Category implements Comparable<Category> {
     private long id;
     private String name;
     private int status = 0;
-//    @OneToMany(mappedBy = "id")
-//    private List<Product> products;
+    @OneToMany(mappedBy = "id", cascade = CascadeType.ALL)
+    private List<Product> products;
 
 
 //    public void removeProduct(Product product) {
