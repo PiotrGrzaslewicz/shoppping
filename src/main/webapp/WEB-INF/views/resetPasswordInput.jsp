@@ -45,7 +45,14 @@
 
                     <div class="flex-row">
 
-                        <h3 class="font-weight-bold text-gray-500">Logowanie</h3>
+                        <a href="/login"
+                           class="btn btn-info btn-sm btn-icon-split">
+                                                 <span class="icon text-white-50">
+                                                    <i class="fas fa-play"></i>
+                                                 </span>
+                            <span class="text">LOGOWANIE</span>
+                        </a>
+
                     </div>
 
                     <div class="flex-row">

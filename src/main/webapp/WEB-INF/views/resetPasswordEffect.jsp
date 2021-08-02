@@ -45,7 +45,28 @@
 
                     <div class="flex-row">
 
-                        <h3 class="font-weight-bold text-gray-500">Logowanie</h3>
+                        <a href="/login"
+                           class="btn btn-info btn-sm btn-icon-split">
+                                                 <span class="icon text-white-50">
+                                                    <i class="fas fa-play"></i>
+                                                 </span>
+                            <span class="text">LOGOWANIE</span>
+                        </a>
+
+                    </div>
+
+                    <div class="flex-row">
+                        <div>
+
+                            <a href="/demo"
+                               class="btn btn-warning btn-sm btn-icon-split">
+                                                 <span class="icon text-white-50">
+                                                    <i class="fas fa-play"></i>
+                                                 </span>
+                                <span class="text">DEMO</span>
+                            </a>
+
+                        </div>
                     </div>
 
 
@@ -79,7 +100,7 @@
                         <div class="card shadow mb-4 border-left-0 border-bottom-0 border-right-0 border-top-0 bg-gray-700">
                             <!-- Card Header - Accordion -->
                             <a  class="d-block card-header py-3 bg-gray-900 border-bottom-0">
-                                <h6 class="m-0 font-weight-bold text-white">Błąd</h6>
+                                <h6 class="m-0 font-weight-bold text-white">Resetowanie hasła</h6>
                             </a>
                             <!-- Card Content - Collapse -->
                             <div class="collapse show" id="coll2">
@@ -87,7 +108,7 @@
                                      style="display: flex; justify-content: space-between; padding-top: 5px; padding-bottom: 5px ">
                                     <div class="">
 
-                                        Ups! Coś poszło nie tak...
+                                        ${msg}
 
                                     </div>
 

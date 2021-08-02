@@ -176,8 +176,15 @@ public class UserController {
     }
 
     @PostMapping("/resetPassword")
-    public String resetPassword(Model model) {
-
+    public String resetPassword(Model model, @RequestParam String username) {
+        String msg;
+        if (userService.findByEmail(username)==null) {
+            msg = "Użytkownik o podanym adresie nie istnieje";
+        }
+        else {
+            msg = "Na podany adres email wysłaliśmy link do zresetowania hasła. Sprawdź swoją skrzynkę pocztową";
+        }
+        model.addAttribute("msg", "efekt");
         return "resetPasswordEffect";
     }
 
