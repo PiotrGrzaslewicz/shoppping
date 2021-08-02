@@ -94,7 +94,7 @@
                             <!-- Card Header - Accordion -->
                             <a  class="d-block card-header py-3 bg-gray-900 border-bottom-0"
                             >
-                                <h6 class="m-0 font-weight-bold text-white">Wprowadź swóje dane</h6>
+                                <h6 class="m-0 font-weight-bold text-white">Podaj swój adres email, na który wyślemy link do zmiany hasła</h6>
                             </a>
                             <!-- Card Content - Collapse -->
                             <div class="collapse show" id="coll2">
@@ -103,34 +103,21 @@
                                     <div class="">
                                         <p class="text-sm-center text-danger">${msg}</p>
 
-                                        <form class="user" action="${pageContext.request.contextPath}/login" method="post">
+                                        <form class="user" action="${pageContext.request.contextPath}/resetPassword" method="post">
 
                                             <div class="form-group">
                                                 <input type="email" class="form-control bg-light border-0 small" id="exampleInputEmail" placeholder="Email" name="username">
                                             </div>
-                                            <div class="form-group row">
-                                                <div class="col-sm-6 mb-3 mb-sm-0">
-                                                    <input type="password" class="form-control bg-light border-0 small" id="exampleInputPassword" placeholder="Hasło" name="password">
-                                                </div>
-
-                                            </div>
                                             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                                             <div class="input-group-append">
                                                 <button class="btn btn-info" type="submit">
-                                                    <i class="fas fa-user fa-sm"></i> Zaloguj
+                                                    <i class="fas fa-user fa-sm"></i> Wyślij
                                                 </button>
                                             </div>
 
 
                                         </form>
 
-
-                                        <div class="text-center row">
-                                            <a class="small text-white" href="/register">Nie masz konta? Zarejestruj się!</a>
-                                        </div>
-                                        <div class="text-center row">
-                                            <a class="small text-white" href="/resetPassword">Zapomniałem hasła</a>
-                                        </div>
                                     </div>
 
 

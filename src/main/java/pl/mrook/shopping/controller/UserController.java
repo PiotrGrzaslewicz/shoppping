@@ -1,20 +1,19 @@
 package pl.mrook.shopping.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.View;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pl.mrook.shopping.model.User;
 import pl.mrook.shopping.service.CurrentUser;
+import pl.mrook.shopping.service.MailService;
 import pl.mrook.shopping.service.SpringDataUserDetailsService;
 import pl.mrook.shopping.service.UserService;
 
+import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -25,11 +24,13 @@ public class UserController {
 
     private final UserService userService;
     private final SpringDataUserDetailsService detailsService;
+    private final MailService mailService;
 
 
-    public UserController(UserService userService, SpringDataUserDetailsService detailsService) {
+    public UserController(UserService userService, SpringDataUserDetailsService detailsService, MailService mailService) {
         this.userService = userService;
         this.detailsService = detailsService;
+        this.mailService = mailService;
     }
 
     @GetMapping("/user/edit")
@@ -169,5 +170,21 @@ public class UserController {
         }
     }
 
+    @GetMapping("/resetPassword")
+    public String resetPasswordForm() {
+        return "resetPasswordInput";
+    }
 
+    @PostMapping("/resetPassword")
+    public String resetPassword(Model model) {
+
+        return "resetPasswordEffect";
+    }
+
+    @GetMapping("/sendMail")
+    public void sendMail() throws MessagingException {
+        mailService.sendMail("test@test.com",
+                "Test Subject",
+                "<b>test message</b><br>:P", true);
+    }
 }
