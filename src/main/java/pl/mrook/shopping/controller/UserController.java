@@ -33,7 +33,6 @@ public class UserController {
     private final PasswordResetTokenRepository passwordResetTokenRepository;
 
 
-
     public UserController(UserService userService, SpringDataUserDetailsService detailsService, MailService mailService, MessageSource messageSource, PasswordResetTokenRepository passwordResetTokenRepository) {
         this.userService = userService;
         this.detailsService = detailsService;
@@ -187,10 +186,9 @@ public class UserController {
     public String resetPassword(Model model, @RequestParam String username, HttpServletRequest request) throws MessagingException {
         String msg;
         User user = userService.findByEmail(username);
-        if (user==null) {
+        if (user == null) {
             msg = messageSource.getMessage("noUserFound", null, request.getLocale());
-        }
-        else {
+        } else {
 
             String token = UUID.randomUUID().toString();
             userService.createPasswordResetTokenForUser(user, token);
@@ -210,6 +208,7 @@ public class UserController {
                 PasswordResetToken currentToken = passwordResetTokenRepository.findByToken(token);
                 User user = currentToken.getUser();
                 model.addAttribute("user", user);
+                model.addAttribute("token", token);
                 return "getNewPassword";
             case "invalid":
                 model.addAttribute("msg", messageSource.getMessage("invalidResetPasswordToken", null, locale));
@@ -222,16 +221,22 @@ public class UserController {
     }
 
     @PostMapping("/resetPasswordConfirmed")
-    public String resetPasswordFinal(@RequestParam String password, @RequestParam String repassword, Model model, Locale locale, @RequestParam Long id) {
+    public String resetPasswordFinal(@RequestParam String password, @RequestParam String repassword, Model model, Locale locale, @RequestParam Long id
+            , @RequestParam String token) {
         User user = userService.findById(id);
-        //TODO working here
+        model.addAttribute("user", user);
         if (!User.checkPassword(password)) {
             model.addAttribute("msg", "Hasło musi mieć co najmniej jedną wielką literę, jedną małą literę i jedną cyfrę oraz długość od 5 do 30 znaków");
-            return "/user/changepassword";
+            return "/getNewPassword";
         } else if (!(password.equals(repassword))) {
             model.addAttribute("msg", "Hasła nie są identyczne");
-            return "/user/changepassword";
-        return "";
+            return "getNewPassword";
+        } else  {
+            user.setPassword(password);
+            userService.saveUser(user);
+            model.addAttribute("msg", messageSource.getMessage("passwordResetConfirmed", null, locale));
+            return "resetPasswordEffect";
+        }
     }
 
 }

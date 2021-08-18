@@ -122,6 +122,7 @@
                                             </div>
                                             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                                             <input type="hidden" name="id" value="${user.id}"/>
+                                            <input type="hidden" name="token" value="${token}"/>
                                             <div class="input-group-append">
                                                 <button class="btn btn-info" type="submit">
                                                     <i class="fas fa-user fa-sm"></i> Wyślij

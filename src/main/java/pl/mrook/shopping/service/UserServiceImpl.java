@@ -92,6 +92,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void createPasswordResetTokenForUser(User user, String token) {
+        passwordResetTokenRepository.findAllByUser(user).forEach(passwordResetTokenRepository::delete);
         PasswordResetToken newToken = new PasswordResetToken(token, user);
         passwordResetTokenRepository.save(newToken);
     }
@@ -111,7 +112,7 @@ public class UserServiceImpl implements UserService {
         PasswordResetToken currentToken = passwordResetTokenRepository.findByToken(token);
         if (currentToken==null) {
             return "invalid";
-        } else if (!currentToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+        } else if (currentToken.getExpiryDate().isBefore(LocalDateTime.now())) {
             return "expired";
         } else {
             return "OK";
