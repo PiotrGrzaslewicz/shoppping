@@ -1,18 +1,20 @@
 package pl.mrook.shopping.service;
 
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import pl.mrook.shopping.model.PasswordResetToken;
 import pl.mrook.shopping.model.Role;
 import pl.mrook.shopping.model.User;
-import pl.mrook.shopping.repository.MemoRepository;
-import pl.mrook.shopping.repository.RoleRepository;
-import pl.mrook.shopping.repository.ShoppingListRepository;
-import pl.mrook.shopping.repository.UserRepository;
+import pl.mrook.shopping.repository.*;
 
+import javax.mail.MessagingException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Locale;
 
 @Service
 @Primary
@@ -22,14 +24,20 @@ public class UserServiceImpl implements UserService {
     private final ShoppingListRepository shoppingListRepository;
     private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final MailService mailService;
+    private final MessageSource messageSource;
 
     public UserServiceImpl(UserRepository userRepository, MemoRepository memoRepository, ShoppingListRepository shoppingListRepository, RoleRepository roleRepository,
-                           BCryptPasswordEncoder passwordEncoder) {
+                           BCryptPasswordEncoder passwordEncoder, PasswordResetTokenRepository passwordResetTokenRepository, MailService mailService, MessageSource messageSource) {
         this.memoRepository = memoRepository;
         this.shoppingListRepository = shoppingListRepository;
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
+        this.mailService = mailService;
+        this.messageSource = messageSource;
     }
 
     @Override
@@ -80,5 +88,38 @@ public class UserServiceImpl implements UserService {
         memoRepository.deleteAllByUser(user);
         shoppingListRepository.deleteAllByUser(user);
         saveUser(user);
+    }
+
+    @Override
+    public void createPasswordResetTokenForUser(User user, String token) {
+        PasswordResetToken newToken = new PasswordResetToken(token, user);
+        passwordResetTokenRepository.save(newToken);
+    }
+
+    @Override
+    public void sendPasswordResetEmail(User user, String token, String contextPath, Locale locale) throws MessagingException {
+        String mail = user.getEmail();
+        String link = "<a href = \"" + contextPath + "/reset?token=" + token + "\">" + messageSource.getMessage("resetPasswordLinkLabbel", null, locale) + "</a>";
+        StringBuilder sb = new StringBuilder();
+        sb.append(messageSource.getMessage("resetPasswordDescription", null, locale));
+        sb.append(link);
+        mailService.sendMail(mail, messageSource.getMessage("resetPasswordMailTopic", null, locale), sb.toString(), true);
+    }
+
+    @Override
+    public String validatePasswordResetToken(String token) {
+        PasswordResetToken currentToken = passwordResetTokenRepository.findByToken(token);
+        if (currentToken==null) {
+            return "invalid";
+        } else if (!currentToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            return "expired";
+        } else {
+            return "OK";
+        }
+    }
+
+    @Override
+    public User findById(Long id) {
+        return userRepository.findById(id).get();
     }
 }

@@ -1,13 +1,16 @@
 package pl.mrook.shopping.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import pl.mrook.shopping.model.PasswordResetToken;
 import pl.mrook.shopping.model.User;
+import pl.mrook.shopping.repository.PasswordResetTokenRepository;
 import pl.mrook.shopping.service.CurrentUser;
 import pl.mrook.shopping.service.MailService;
 import pl.mrook.shopping.service.SpringDataUserDetailsService;
@@ -17,6 +20,8 @@ import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.Locale;
+import java.util.UUID;
 
 @Slf4j
 @Controller
@@ -24,13 +29,16 @@ public class UserController {
 
     private final UserService userService;
     private final SpringDataUserDetailsService detailsService;
-    private final MailService mailService;
+    private final MessageSource messageSource;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
 
 
-    public UserController(UserService userService, SpringDataUserDetailsService detailsService, MailService mailService) {
+
+    public UserController(UserService userService, SpringDataUserDetailsService detailsService, MailService mailService, MessageSource messageSource, PasswordResetTokenRepository passwordResetTokenRepository) {
         this.userService = userService;
         this.detailsService = detailsService;
-        this.mailService = mailService;
+        this.messageSource = messageSource;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
 
     @GetMapping("/user/edit")
@@ -176,22 +184,54 @@ public class UserController {
     }
 
     @PostMapping("/resetPassword")
-    public String resetPassword(Model model, @RequestParam String username) {
+    public String resetPassword(Model model, @RequestParam String username, HttpServletRequest request) throws MessagingException {
         String msg;
-        if (userService.findByEmail(username)==null) {
-            msg = "Użytkownik o podanym adresie nie istnieje";
+        User user = userService.findByEmail(username);
+        if (user==null) {
+            msg = messageSource.getMessage("noUserFound", null, request.getLocale());
         }
         else {
-            msg = "Na podany adres email wysłaliśmy link do zresetowania hasła. Sprawdź swoją skrzynkę pocztową";
+
+            String token = UUID.randomUUID().toString();
+            userService.createPasswordResetTokenForUser(user, token);
+            userService.sendPasswordResetEmail(user, token, request.getRequestURL().toString(), request.getLocale());
+
+            msg = messageSource.getMessage("resetEmailSent", null, request.getLocale());
         }
-        model.addAttribute("msg", "efekt");
+        model.addAttribute("msg", msg);
         return "resetPasswordEffect";
     }
 
-    @GetMapping("/sendMail")
-    public void sendMail() throws MessagingException {
-        mailService.sendMail("test@test.com",
-                "Test Subject",
-                "<b>test message</b><br>:P", true);
+    @GetMapping("/resetPassword/reset")
+    public String resetPasswordCheckToken(@RequestParam String token, Locale locale, Model model) {
+        String result = userService.validatePasswordResetToken(token);
+        switch (result) {
+            case "OK":
+                PasswordResetToken currentToken = passwordResetTokenRepository.findByToken(token);
+                User user = currentToken.getUser();
+                model.addAttribute("user", user);
+                return "getNewPassword";
+            case "invalid":
+                model.addAttribute("msg", messageSource.getMessage("invalidResetPasswordToken", null, locale));
+                break;
+            case "expired":
+                model.addAttribute("msg", messageSource.getMessage("expiredResetPasswordToken", null, locale));
+                break;
+        }
+        return "resetPasswordEffect";
     }
+
+    @PostMapping("/resetPasswordConfirmed")
+    public String resetPasswordFinal(@RequestParam String password, @RequestParam String repassword, Model model, Locale locale, @RequestParam Long id) {
+        User user = userService.findById(id);
+        //TODO working here
+        if (!User.checkPassword(password)) {
+            model.addAttribute("msg", "Hasło musi mieć co najmniej jedną wielką literę, jedną małą literę i jedną cyfrę oraz długość od 5 do 30 znaków");
+            return "/user/changepassword";
+        } else if (!(password.equals(repassword))) {
+            model.addAttribute("msg", "Hasła nie są identyczne");
+            return "/user/changepassword";
+        return "";
+    }
+
 }
